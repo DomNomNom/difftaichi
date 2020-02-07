@@ -1,0 +1,7 @@
+# Ignore output image files.
+billiards/*
+diffmpm/*
+electric/*
+mass_spring/*
+rigid_body/*
+rigid_body_toi/*
