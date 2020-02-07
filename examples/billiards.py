@@ -129,12 +129,12 @@ def forward(visualize=False, output=None):
           pixel_radius // 2).color(0x00000).finish()
 
       for i in range(n_balls):
-        if i == 0:
-          color = 0xCCCCCC
-        elif i == n_balls - 1:
-          color = 0x3344cc
+        if i == target_ball:
+          color = 0x3344cc  # target_ball is blue.
+        elif i == 0:
+          color = 0xCCCCCC  # cue ball is white.
         else:
-          color = 0xF20530
+          color = 0xF20530  # other balls are red.
 
         canvas.circle(ti.vec(
             x[t, i][0], x[t, i][1])).radius(pixel_radius).color(color).finish()
