@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 real = ti.f32
 ti.init(default_fp=real)
 
+max_iterations = 50
 max_steps = 2048
 vis_interval = 64
 output_vis_interval = 16
@@ -33,7 +34,7 @@ billiard_layers = 4
 n_balls = 1 + (1 + billiard_layers) * billiard_layers // 2
 target_ball = n_balls - 1
 # target_ball = 0
-goal = [0.9, 0.75]
+goal = [0.9, 0.5]
 radius = 0.03
 elasticity = 0.8
 
@@ -101,6 +102,7 @@ gui = ti.core.GUI("Billiards", ti.veci(1024, 1024))
 
 def forward(visualize=False, output=None):
   initialize()
+  output=None
 
   interval = vis_interval
   if output:
@@ -154,13 +156,14 @@ def clear():
 
 
 def optimize():
-  init_x[None] = [0.1, 0.5]
+  init_x[None] = [0.1, 0.65]
   init_v[None] = [0.3, 0.0]
 
   clear()
   # forward(visualize=True, output='initial')
 
-  for iter in range(200):
+  losses = []
+  for iter in range(max_iterations):
     clear()
 
     with ti.Tape(loss):
@@ -168,12 +171,23 @@ def optimize():
         output = 'iter{:04d}'.format(iter)
       else:
         output = None
-      forward(visualize=True, output=output)
+      forward(visualize=0==iter%3, output=output)
 
     print('Iter=', iter, 'Loss=', loss[None])
+    losses.append(loss[None])
+
     for d in range(2):
       init_x[None][d] -= learning_rate * init_x.grad[None][d]
       init_v[None][d] -= learning_rate * init_v.grad[None][d]
+
+  plt.plot(list(range(max_iterations)), losses)
+  fig = plt.gcf()
+  fig.set_size_inches(5, 3)
+  plt.title('Billiard Scene Objective')
+  plt.ylabel('Loss')
+  plt.xlabel('Iter')
+  plt.tight_layout()
+  plt.show()
 
   clear()
   forward(visualize=True, output='final')
@@ -197,18 +211,10 @@ def scan(zoom):
     losses.append(loss[None])
     angles.append(math.degrees(alpha))
 
-  plt.plot(angles, losses)
-  fig = plt.gcf()
-  fig.set_size_inches(5, 3)
-  plt.title('Billiard Scene Objective')
-  plt.ylabel('Objective')
-  plt.xlabel('Angle of velocity')
-  plt.tight_layout()
-  plt.show()
 
 
 if __name__ == '__main__':
-  if len(sys.argv) > 1:
-    scan(float(sys.argv[1]))
-  else:
-    optimize()
+  optimize()
+  # if len(sys.argv) > 1:
+  #   scan(float(sys.argv[1]))
+  # else:
