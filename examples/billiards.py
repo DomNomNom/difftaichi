@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 real = ti.f32
 ti.init(default_fp=real)
 
-max_iterations = 50
+max_iterations = 40
 max_steps = 2048
 vis_interval = 64
 output_vis_interval = 16
@@ -181,6 +181,7 @@ def optimize():
       init_v[None][d] -= learning_rate * init_v.grad[None][d]
 
   plt.plot(list(range(max_iterations)), losses)
+  plt.ylim(ymin=0)
   fig = plt.gcf()
   fig.set_size_inches(5, 3)
   plt.title('Billiard Scene Objective')
